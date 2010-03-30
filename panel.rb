@@ -5,37 +5,57 @@ class Panel
   #   It should attempt to update them upon successful connection via serial
   #   Important! App should make sure it doesn't terminate the connection to the device
   #   App may need to send out a heartbeat every 30 seconds (guess) to keep connection alive
-  #   After update of LED run something like Panel.new.send(22, 4, 'ff0000')
+  #   After update of LED run something like Panel.new.write(4, 22, 'ff0000')
 
   # TODO:
   #   remove "initialize" method's SerialPort stuff and incorporate into initializers for the app
   #   "watch" method seems to not be important.
 
   require 'serialport'
-
+  
   def initialize()
     puts "Starting serial gateway"
     begin
       @sp = SerialPort.new "/dev/tty.usbserial-A6004cNN", 115200, 8, 1, SerialPort::NONE
+      self.fps = 12
       at_exit { puts "[Closing connection to panels]" }
     rescue => e
       puts "Cannot initialize panels, connection to master panel failed."
     end
   end
-
+  
+  def fps
+    @fps
+  end
+  
+  def fps=(fps)
+    @fps = fps
+    @rate = nil
+  end
+  
+  def rate
+    @rate ||= 1000000 / self.fps
+  end
+  
+  def new_frame?
+    now = Time.now.usec
+    diff = now - @then.to_i
+    if diff < 0 || diff > self.rate
+      @then = now
+      true
+    end
+  end
+  
   def watch
     pid = Process.fork do
       Process.fork do
-
         sleep 10
-
         while true do
           sleep 1
           # sp.putc "y"
           @sp.write('heartbeat')
           puts "sent, connected at: #{@sp.write('heartbeat')}"
         end
-
       end
       exit
     end
@@ -54,7 +74,7 @@ class Panel
     return ["\x01", address, "\x04", "\x00", "c", command ]
   end
 
-  def send(length, address, command)
+  def write(address, length, command)
 
     @address = self.setup_address(address)
     @command = self.setup_command(command)
@@ -66,6 +86,28 @@ class Panel
     end
 
     @sp.write cmd
+  end
+  
+  def play
+    @run = true
+  end
+  
+  def pause
+    @run = false
+  end
+  
+  # keyframes in format [["pixel1color","pixel2color"],["pixel1color","pixel2color"]]
+  #
+  def animate(keyframes)
+    i = 0
+    self.play
+    while @run
+      if self.new_frame?
+        ## TODO : translate keyframe into real mapping
+        # self.write keyframes[i]
+        i = (i == keyframes.length-1) ? 0 : i + 1
+      end
+    end
   end
 
   def blink
