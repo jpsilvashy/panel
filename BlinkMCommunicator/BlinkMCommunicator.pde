@@ -35,7 +35,7 @@
 #include "Wire.h"
 #include "BlinkM_funcs.h"
 
-//#define DEBUG 1
+// #define DEBUG 1
 
 // set this if you're plugging a BlinkM directly into an Arduino,
 // into the standard position on analog in pins 2,3,4,5
@@ -52,7 +52,7 @@ int ledPin = 13;
 
 void setup()
 {
-  Serial.begin(19200); 
+  Serial.begin(115200); 
   Serial.println("BlinkMCommunicator starting up...");
 
   pinMode(ledPin, OUTPUT);
