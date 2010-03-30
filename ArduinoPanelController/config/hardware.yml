@@ -1,0 +1,17 @@
+##############################################################
+# Today's MCU Choices (replace the mcu with your arduino board)
+# atmega8 => Arduino NG or older w/ ATmega8
+# atmega168 => Arduino NG or older w/ ATmega168
+# mini => Arduino Mini
+# bt  => Arduino BT
+# diecimila  => Arduino Diecimila or Duemilanove w/ ATmega168
+# nano  => Arduino Nano
+# lilypad  => LilyPad Arduino
+# pro => Arduino Pro or Pro Mini (8 MHz)
+# atmega328 => Arduino Duemilanove w/ ATmega328
+# mega => Arduino Mega
+
+--- 
+serial_port: /dev/tty.usbserial*
+physical_reset: false
+mcu: atmega168
